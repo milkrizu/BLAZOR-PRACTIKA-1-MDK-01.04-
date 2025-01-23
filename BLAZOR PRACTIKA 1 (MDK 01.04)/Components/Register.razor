@@ -1,0 +1,61 @@
+﻿@using BLAZOR_PRACTIKA_1.NDK_01_0U.ApiRequest
+@page "/register"
+@inject ApiRequestService ApiRequestService
+@inject NavigationManager Navigation
+
+<h3>Регистрация</h3>
+
+<EditForm Model="@registerRequest" OnValidSubmit="HandleRegister">
+    <DataAnnotationsValidator />
+    <ValidationSummary />
+
+    <div>
+        <label>Имя:</label>
+        <InputText @bind-Value="registerRequest.Name" />
+    </div>
+    <div>
+        <label>Email:</label>
+        <InputText @bind-Value="registerRequest.Email" />
+    </div>
+    <div>
+        <label>Описание:</label>
+        <InputText @bind-Value="registerRequest.Description" />
+    </div>
+    <div>
+        <label>Пароль:</label>
+        <InputText type="password" @bind-Value="registerRequest.Password" />
+    </div>
+    <button type="submit">Зарегистрироваться</button>
+</EditForm>
+
+@if (!string.IsNullOrEmpty(errorMessage))
+{
+    <div class="alert alert-danger">@errorMessage</div>
+}
+
+@code {
+    private RegisterRequest registerRequest = new RegisterRequest();
+    private string errorMessage;
+
+    private async Task HandleRegister()
+    {
+        errorMessage = null; // Сбрасываем сообщение об ошибке
+
+        try
+        {
+            var success = await ApiRequestService.RegisterAsync(registerRequest);
+            if (success)
+            {
+                Navigation.NavigateTo("/login"); // Перенаправляем на страницу входа
+            }
+            else
+            {
+                errorMessage = "Ошибка при регистрации. Пожалуйста, попробуйте снова.";
+            }
+        }
+        catch (Exception ex)
+        {
+            errorMessage = $"Произошла ошибка: {ex.Message}";
+        }
+    }
+}
